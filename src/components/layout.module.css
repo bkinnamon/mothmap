@@ -1,0 +1,65 @@
+.page {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.page header {
+  background-color: #e21833;
+  background: linear-gradient(#e21833, #c9162e);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  height: 3rem;
+}
+
+.page header * {
+  flex: 1;
+}
+
+.page header .brand {
+  text-align: left;
+}
+
+.page header .page-title {
+  text-align: center;
+}
+
+.page header nav {
+  height: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.page header nav a {
+  flex: 0 0 auto;
+  padding: 0 1rem;
+  height: 3rem;
+  line-height: 3rem;
+  transition: all 0.5s ease;
+}
+
+.page header nav a:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.page header h1 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.page header a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.page main {
+  flex: 1;
+}
+
+.page main .content {
+  height: 100%;
+}
