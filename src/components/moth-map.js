@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import Firebase from 'firebase/app'
 import 'firebase/firestore'
 import { Map, Marker, Popup, TileLayer } from 'react-leaflet'
-import Leaflet from 'leaflet'
 
 const projectId = 'moth-map'
 const senderId = '795327380062'
@@ -23,6 +22,7 @@ const db = Firebase.firestore()
 export default class MothMap extends Component {
   constructor(props) {
     super(props)
+
     this.state = {
       sites: [],
       mapAttributes: {}
@@ -46,9 +46,15 @@ export default class MothMap extends Component {
       .then(() => {
         // Setup the map attributes (center and zoom or the bounds)
         if (sites.length > 1) {
-          mapAttributes.bounds = Leaflet.latLngBounds(
-            sites.map(site => [site.Position.latitude, site.Position.longitude])
-          )
+          let min = [sites[0].Position.latitude, sites[0].Position.longitude]
+          let max = [sites[0].Position.latitude, sites[0].Position.longitude]
+          sites.forEach(site => {
+            min[0] = Math.min(site.Position.latitude, min[0])
+            min[1] = Math.min(site.Position.longitude, min[1])
+            max[0] = Math.max(site.Position.latitude, max[0])
+            max[1] = Math.max(site.Position.longitude, max[1])
+          })
+          mapAttributes.bounds = [min, max]
         } else if (sites.length === 1) {
           mapAttributes.center = [
             sites[0].Position.latitude,
@@ -78,7 +84,6 @@ export default class MothMap extends Component {
 
   render() {
     const { sites, mapAttributes } = this.state
-
     if (typeof window !== undefined && sites.length > 0) {
       return (
         <Map style={{ height: '100%' }} {...mapAttributes}>
@@ -96,9 +101,8 @@ export default class MothMap extends Component {
           ))}
         </Map>
       )
-    } else {
-      return <p>Loading...</p>
     }
+    return <p>Loading...</p>
   }
 
   calcFiveDayAvg(site) {
