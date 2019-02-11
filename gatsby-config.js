@@ -16,6 +16,6 @@ module.exports = {
       }
     },
     'gatsby-plugin-react-leaflet',
-    'gatsby-plugin-page-transitions'
+    'gatsby-plugin-transition-link'
   ]
 }

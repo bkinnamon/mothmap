@@ -44,6 +44,7 @@ export default class MothMap extends Component {
         })
       })
       .then(() => {
+        // Setup the map attributes (center and zoom or the bounds)
         if (sites.length > 1) {
           mapAttributes.bounds = Leaflet.latLngBounds(
             sites.map(site => [site.Position.latitude, site.Position.longitude])
@@ -55,6 +56,21 @@ export default class MothMap extends Component {
           ]
           mapAttributes.zoom = 13
         }
+      })
+      .then(() => {
+        // Create the popups' contents
+        sites.forEach(site => {
+          const fiveDayAvg = this.calcFiveDayAvg(site)
+          const fiveDayStr = fiveDayAvg !== -1 ? fiveDayAvg : 'no data found'
+          site.popup = (
+            <div>
+              <h3>{site.Name}</h3>
+              <p>
+                <strong>5-day Average:</strong> {fiveDayStr}
+              </p>
+            </div>
+          )
+        })
 
         this.setState({ sites, mapAttributes })
       })
@@ -64,7 +80,6 @@ export default class MothMap extends Component {
     const { sites, mapAttributes } = this.state
 
     if (typeof window !== undefined && sites.length > 0) {
-      console.log(sites)
       return (
         <Map style={{ height: '100%' }} {...mapAttributes}>
           <TileLayer
@@ -76,7 +91,7 @@ export default class MothMap extends Component {
               key={site.id}
               position={[site.Position.latitude, site.Position.longitude]}
             >
-              <Popup>{site.Name}</Popup>
+              <Popup>{site.popup}</Popup>
             </Marker>
           ))}
         </Map>
@@ -84,5 +99,37 @@ export default class MothMap extends Component {
     } else {
       return <p>Loading...</p>
     }
+  }
+
+  calcFiveDayAvg(site) {
+    if (site.Entries.length === 0) {
+      return -1
+    }
+
+    // Copy and sort the entries by date (newest first)
+    const entries = site.Entries.map(e => ({
+      count: e.Count,
+      date: e.Date.toDate()
+    }))
+    entries.sort((e1, e2) => e2.date - e1.date)
+
+    // Get the count for at least five days if possible
+    const start = entries[0].date
+    let count = entries[0].count
+    let end
+    entries.slice(1).some(entry => {
+      count += entry.count
+      end = entry.date
+      return this.daysDiff(end, start) >= 5
+    })
+
+    // Calculate the average over the last five days
+    return (count / this.daysDiff(end, start)) * 5
+  }
+
+  daysDiff(date1, date2) {
+    const MILLIS_IN_DAY = 86400000
+    const diff = date1 - date2
+    return Math.abs(Math.ceil(diff / MILLIS_IN_DAY))
   }
 }
