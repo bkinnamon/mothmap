@@ -28,6 +28,19 @@ module.exports = {
         // Setting this parameter is also optional
         respectDNT: true
       }
-    }
+    },
+    {
+      resolve: 'gatsby-plugin-manifest',
+      options: {
+        name: 'Moth Map',
+        short_name: 'Moth Map',
+        start_url: '/',
+        background_color: '#dddddd',
+        theme_color: '#e21833',
+        display: 'standalone',
+        icon: 'static/icon.png'
+      }
+    },
+    'gatsby-plugin-offline'
   ]
 }
